@@ -247,13 +247,17 @@ function start(){
     } else if (arg._.length==1 && arg._[0] =="check") {
         if(arg.config){
             readFile();
+            db.cmdCheck();
+        } else {
+            console.log("Please specify --config file to use");
         }
-        db.cmdCheck();
     } else if (arg._.length==1 && arg._[0] =="update") {
         if(arg.config){
             readFile();
+            db.cmdUpdate();
+        } else {
+            console.log("Please specify --config file to use");
         }
-        db.cmdUpdate();
     } else {
         console.log("\nUnknown or missing command\n");
         yarg.showHelp();

@@ -1,7 +1,11 @@
 {
     "author":"PushOk Software <contact@pushok.com>",
     "name":"misure",
-    "version":"0.1.2",
+    "version":"0.1.3",
+    "repository": {
+		"type": "git",
+		"url": "git://github.com/sergeyksv/misure.git"
+	},
     "contributors": [
 		{
 			"name": "Sergey Korotkov",
@@ -15,7 +19,7 @@
     "main":"./index",
     "bin" : { "misure" : "./index.js" },
     "dependencies": {
-        "mongodb": "~1.4.x",
+        "mongodb": "1.4.22",
         "lodash": "~3.3.x",
         "safe": "~0.3.x",
         "yargs":"~3.26.x"
