@@ -1,6 +1,17 @@
 {
+    "author":"PushOk Software <contact@pushok.com>",
     "name":"misure",
-    "version":"0.1.1",
+    "version":"0.1.2",
+    "contributors": [
+		{
+			"name": "Sergey Korotkov",
+			"email": "sergeyksv@gmail.com"
+		},
+		{
+			"name": "Alexey Dudyakov",
+			"email": "alexd@pushok.com"
+		}
+	],
     "main":"./index",
     "bin" : { "misure" : "./index.js" },
     "dependencies": {
