@@ -172,7 +172,10 @@ var Db = function(arg){
 
     self.exit = function(err){
         if (err) {
-            console.trace(err);
+            if (err.stack)
+                console.log(err.stack);
+            else
+                console.trace(err);
         }
         process.exit(1);
     };
