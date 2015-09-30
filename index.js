@@ -11,7 +11,7 @@ var yarg = require('yargs')
     .option( "h", { alias: "host", demand: false, describe: "Hostname", type: "string" })
     .option( "d", { alias: "db",   demand: false, describe: "Database", type: "string" })
     .option( "port", { demand: false, describe: "Port", type: "string" })
-    .option( "a", { alias: "auth", demand: false, describe: "Authentication", type: "string" })
+    .option( "a", { alias: "auth", demand: false, describe: "Authentication", type: "boolean" })
     .option( "u", { alias: "user", demand: false, describe: "Username", type: "string" })
     .option( "p", { alias: "password", demand: false, describe: "Password", type: "string" })
     .option( "config", { demand: false, describe: "JSON file with db information", type: "string" })
@@ -59,12 +59,10 @@ var Db = function(arg){
     };
 
     self.getCollections = function(cb){
-        db.collectionNames(self.name_collections,{namesOnly:true},safe.sure(cb,function(res){
+        db.listCollections().toArray(safe.sure(cb,function(res){
             _.each(res,function(elem){
-                elem = elem.replace(self.conf.db+".","");
-                if( elem.indexOf("system.") != -1 )
-                    return;
-                self.collections.push(elem);
+                if (elem.name.indexOf("system."!==0))
+                    self.collections.push(elem.name);
             });
             self.collections = self.collections.sort();
             cb();
@@ -87,10 +85,10 @@ var Db = function(arg){
 
                     var arr_name = [];
                     var obj_key = _.reduce(val, function(memo,num){
-                        arr_name.push(num[0],num[1])
-                        memo[ num[0] ] = num[1]
+                        arr_name.push(num[0],num[1]);
+                        memo[ num[0] ] = num[1];
                         return memo;
-                    },{})
+                    },{});
                     var key_name = arr_name.join('_');
                     obj[key_name] = obj_key;
                 });
@@ -103,9 +101,9 @@ var Db = function(arg){
     };
 
     self.checkIndex = function(cb){
-        var not_found_col = []
+        var not_found_col = [];
 
-        console.log("")
+        console.log("");
 
         _.each(self.indexes,function(idx,col){
             if (!self.misureIndex[col]){
@@ -120,7 +118,7 @@ var Db = function(arg){
             self.updateIndexes = {};
 
             if (diff_add.length > 0 || diff_drop.length > 0){
-                self.updateIndexes[col] = {"ensureIdx":[],"dropIdx":[],}
+                self.updateIndexes[col] = {"ensureIdx":[],"dropIdx":[],};
             }else {
                 return;
             }
@@ -128,14 +126,14 @@ var Db = function(arg){
             if (diff_add.length > 0 || diff_drop.length > 0)
                 console.log("---> "+col+"\n");
             if (diff_add.length > 0){
-                self.updateIndexes[col].ensureIdx = _.map(diff_add,function(nam){ return self.misureIndex[col][nam] });
-                console.log("\tEnsureIndexes:")
+                self.updateIndexes[col].ensureIdx = _.map(diff_add,function(nam){ return self.misureIndex[col][nam];});
+                console.log("\tEnsureIndexes:");
                 _.each(self.updateIndexes[col].ensureIdx,function(nam){console.log("\t\t",nam);});
             }
 
             if (diff_drop.length > 0){
                 self.updateIndexes[col].dropIdx = diff_drop;
-                console.log("\tDropIndexes:")
+                console.log("\tDropIndexes:");
                 console.log("\t\t",diff_drop.join('\n\t\t'));
             }
         });
@@ -231,10 +229,12 @@ var db = new Db(arg);
 
 var readFile = function(){
     try {
-        misureIndex = fs.readFileSync(path.resolve(arg.config),'utf8').toString()
+        misureIndex = fs.readFileSync(path.resolve(arg.config),'utf8').toString();
         misureIndex = JSON.parse(misureIndex).indexes;
     } catch (e) {
-        console.log("Not parce file config");
+        console.log("\nError: Cannot load/parse --config file\n");
+        yarg.showHelp();
+        process.exit(1);
     }
     db.misureIndex = misureIndex || {};
 };
@@ -259,7 +259,7 @@ function start(){
             console.log("Please specify --config file to use");
         }
     } else {
-        console.log("\nUnknown or missing command\n");
+        console.log("\nError: Unknown or missing command\n");
         yarg.showHelp();
     }
 
