@@ -1,0 +1,15 @@
+{
+    "name":"misure",
+    "version":"0.1.1",
+    "main":"./index",
+    "bin" : { "misure" : "./index.js" },
+    "dependencies": {
+        "mongodb": "~1.4.x",
+        "lodash": "~3.3.x",
+        "safe": "~0.3.x",
+        "yargs":"~3.26.x"
+    },
+    "engines": {
+        "node":"=>v0.10.x"
+    }
+}
