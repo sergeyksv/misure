@@ -100,6 +100,7 @@ var Db = function(arg){
         },cb);
     };
 
+    self.updateIndexes = {};
     self.checkIndex = function(cb){
         var not_found_col = [];
 
@@ -115,7 +116,6 @@ var Db = function(arg){
             var idx_base = _.keys(self.misureIndex[col]);
             var diff_add = _.difference(idx_base,idx_col);
             var diff_drop = _.difference(idx_col,idx_base);
-            self.updateIndexes = {};
 
             if (diff_add.length > 0 || diff_drop.length > 0){
                 self.updateIndexes[col] = {"ensureIdx":[],"dropIdx":[],};
@@ -155,15 +155,19 @@ var Db = function(arg){
             var ensureIdx = self.updateIndexes[col].ensureIdx;
 
             safe.eachSeries(dropIdx,function(Idx,cb){
-                db.dropIndex(col,Idx,safe.sure(cb,function(res){
-                    console.log("Drop "+col+"."+Idx+" -> ",res.ok==1?"Ok":"Fail");
-                    cb();
+                db.collection(col, safe.sure(cb, function (collection) {
+                    collection.dropIndex(Idx,safe.sure(cb,function(res){
+                        console.log("Drop "+col+"."+Idx+" -> ",res.ok==1?"Ok":"Fail");
+                        cb();
+                    }));
                 }));
             },safe.sure(cb,function(){
                 safe.eachSeries(ensureIdx,function(Idx,cb){
-                    db.ensureIndex(col,Idx,self.opt_ensure,safe.sure(cb,function(res){
-                        console.log("Ensure "+col+"."+res);
-                        cb();
+                    db.collection(col, safe.sure(cb, function (collection) {
+                        collection.ensureIndex(Idx,self.opt_ensure,safe.sure(cb,function(res){
+                            console.log("Ensure "+col+"."+res);
+                            cb();
+                        }));
                     }));
                 },cb);
             }));
