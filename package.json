@@ -1,7 +1,7 @@
 {
     "author":"PushOk Software <contact@pushok.com>",
     "name":"misure",
-    "version":"0.1.4",
+    "version":"0.1.5",
     "repository": {
 		"type": "git",
 		"url": "git://github.com/sergeyksv/misure.git"
@@ -14,6 +14,10 @@
 		{
 			"name": "Alexey Dudyakov",
 			"email": "alexd@pushok.com"
+		},
+		{
+			"name": "Igor Dubinin",
+			"email": "igord@pushok.com"
 		}
 	],
     "main":"./index",
