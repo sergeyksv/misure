@@ -34,9 +34,10 @@ var Db = function(arg){
     self.name_collections = null;
     self.collections = [];
     self.indexes = {};
-    self.opt_ensure = null;
     self.misureIndex = {};
-    self.opt_ensure = null;
+    self.opt_ensure = {
+        background: true,
+    };
 
     self.getDb = function(cb){
         // console.log("Connecting to: " + JSON.stringify(self.conf));
@@ -154,18 +155,18 @@ var Db = function(arg){
             var dropIdx = self.updateIndexes[col].dropIdx;
             var ensureIdx = self.updateIndexes[col].ensureIdx;
 
-            safe.eachSeries(dropIdx,function(Idx,cb){
+            safe.eachSeries(ensureIdx,function(Idx,cb){
                 db.collection(col, safe.sure(cb, function (collection) {
-                    collection.dropIndex(Idx,safe.sure(cb,function(res){
-                        console.log("Drop "+col+"."+Idx+" -> ",res.ok==1?"Ok":"Fail");
+                    collection.ensureIndex(Idx,self.opt_ensure,safe.sure(cb,function(res){
+                        console.log("Ensure "+col+"."+res);
                         cb();
                     }));
                 }));
             },safe.sure(cb,function(){
-                safe.eachSeries(ensureIdx,function(Idx,cb){
+                safe.eachSeries(dropIdx,function(Idx,cb){
                     db.collection(col, safe.sure(cb, function (collection) {
-                        collection.ensureIndex(Idx,self.opt_ensure,safe.sure(cb,function(res){
-                            console.log("Ensure "+col+"."+res);
+                        collection.dropIndex(Idx,safe.sure(cb,function(res){
+                            console.log("Drop "+col+"."+Idx+" -> ",res.ok==1?"Ok":"Fail");
                             cb();
                         }));
                     }));
