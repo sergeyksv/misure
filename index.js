@@ -93,8 +93,8 @@ var Db = function(arg){
                     var key_name = arr_name.join('_');
                     obj[key_name] = obj_key;
                 });
-                if(!_.isEmpty(obj))
-                    self.indexes[col] = obj;
+
+                self.indexes[col] = obj;
                 cb();
 
             }));
@@ -103,14 +103,22 @@ var Db = function(arg){
 
     self.updateIndexes = {};
     self.checkIndex = function(cb){
-        var not_found_col = [];
-
-        console.log("");
+        // find collections that not exists, but file has indexes for these
+        var not_exist_col = [];
+        _.each(self.misureIndex, function (idx, col) {
+            if (! self.indexes[col]) {
+                not_exist_col.push(col);
+            }
+        });
 
         _.each(self.indexes,function(idx,col){
-            if (!self.misureIndex[col]){
-                not_found_col.push(col);
+            // return if collection has no necessity of indexes
+            if (! self.misureIndex[col] && _.isEmpty(idx)) {
                 return;
+            }
+            // create empty object, if file has now indexes for this collection
+            else if (! self.misureIndex[col]) {
+                self.misureIndex[col] = {};
             }
 
             var idx_col = _.keys(idx);
@@ -138,8 +146,8 @@ var Db = function(arg){
                 console.log("\t\t",diff_drop.join('\n\t\t'));
             }
         });
-        if (not_found_col.length>0) {
-            console.log("\nCollecions not found:\n"+not_found_col.join("\n"));
+        if (not_exist_col.length>0) {
+            console.log("\nCollections are not exists:\n"+not_exist_col.join("\n"));
         }
         cb();
     };
